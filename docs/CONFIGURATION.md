@@ -135,11 +135,15 @@ Wallet files define the vault/predicate configuration.
 
 ## Getting Wallet Configuration
 
-### From BakoSafe UI
+### From BakoSafe UI (Recommended)
 
-1. Open your vault in BakoSafe
-2. Go to Settings or Export
-3. Copy the predicate configuration
+1. Open [BakoSafe](https://safe.bako.global)
+2. Navigate to your vault
+3. Go to **Settings** (gear icon)
+4. Click **Export Wallet**
+5. Save the exported JSON file to `wallets/<name>.json`
+
+The exported file contains all required fields (`config`, `version`) ready to use with this CLI.
 
 ### From BakoSafe SDK
 

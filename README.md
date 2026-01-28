@@ -47,6 +47,15 @@ Create a network configuration file in `networks/testnet.json`:
 
 ### 2. Configure a Wallet
 
+**Option A: Export from BakoSafe UI (Recommended)**
+
+1. Open [BakoSafe](https://safe.bako.global)
+2. Navigate to your vault → **Settings**
+3. Click **Export Wallet**
+4. Save the file to `wallets/<name>.json`
+
+**Option B: Create manually**
+
 Create a wallet configuration file in `wallets/my-vault.json`:
 
 ```json

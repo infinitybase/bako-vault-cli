@@ -14,6 +14,7 @@ import {
 } from '../utils/config.js';
 import { sendTransaction } from '../services/transaction.js';
 import type { VaultConfig } from '../types.js';
+import {type} from "node:os";
 
 /**
  * Options for the send-tx command
@@ -60,55 +61,7 @@ export async function sendTx(options: SendTxOptions): Promise<void> {
   console.log(chalk.cyan(`    ${pending.hashTxId}`));
 
   // Check if signatures provided via CLI
-  let signatures: Array<{ signer: string; signature: string }> = [];
-
-  if (options.signer && options.signature) {
-    // Single signature via CLI
-    signatures.push({
-      signer: options.signer,
-      signature: options.signature,
-    });
-    console.log(chalk.green(`\n  Signature provided via CLI`));
-  } else {
-    // Interactive mode - collect signatures
-    console.log(chalk.white(`\n  Enter ${pending.requiredSignatures} signature(s):\n`));
-
-    for (let i = 0; i < pending.requiredSignatures; i++) {
-      console.log(chalk.gray(`  --- Signature ${i + 1} of ${pending.requiredSignatures} ---`));
-
-      const sigInput = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'signer',
-          message: 'Signer address (0x...):',
-          validate: (input: string) => {
-            if (!input.startsWith('0x') || input.length !== 66) {
-              return 'Enter a valid B256 address (0x + 64 hex chars)';
-            }
-            return true;
-          },
-        },
-        {
-          type: 'input',
-          name: 'signature',
-          message: 'Signature (0x...):',
-          validate: (input: string) => {
-            if (!input.startsWith('0x')) {
-              return 'Signature should start with 0x';
-            }
-            return true;
-          },
-        },
-      ]);
-
-      signatures.push({
-        signer: sigInput.signer,
-        signature: sigInput.signature,
-      });
-
-      console.log(chalk.green(`  Signature ${i + 1} added\n`));
-    }
-  }
+  let signatures = pending.signatures.map((s: string) => JSON.parse(s));
 
   if (signatures.length < pending.requiredSignatures) {
     console.log(

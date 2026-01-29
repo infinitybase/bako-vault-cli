@@ -92,8 +92,15 @@ export async function sign(options: SignOptions): Promise<void> {
     console.log(chalk.white('\n  Signature:'));
     console.log(chalk.green(`    ${signature}`));
 
+    // Save this signature to pending
+    const sigEntry = JSON.stringify({ signer: signerAddress, signature });
+    if (!pending.signatures.includes(sigEntry)) {
+      pending.signatures.push(sigEntry);
+      savePendingTransaction(pending);
+    }
+
     // Check threshold
-    const currentSignatures = pending.signatures.length + 1;
+    const currentSignatures = pending.signatures.length;
     const requiredSignatures = pending.requiredSignatures;
 
     console.log(chalk.white('\n  Signatures:'));
@@ -122,8 +129,13 @@ export async function sign(options: SignOptions): Promise<void> {
             network: networkConfig,
           };
 
+          // Use only pending signatures (already unique)
+          const allSignatures = pending.signatures.map((s) => JSON.parse(s));
+
+          console.log('allSignatures: ', allSignatures)
+
           // Pass raw signature - sendTransaction will encode it
-          const result = await sendTransaction(config, [{ signer: signerAddress, signature }]);
+          const result = await sendTransaction(config, allSignatures );
 
           spinner.succeed('Transaction sent!');
 
@@ -141,21 +153,14 @@ export async function sign(options: SignOptions): Promise<void> {
           spinner.fail('Failed to send transaction');
           console.error(chalk.red(`\nError: ${(error as Error).message}\n`));
 
-          showSendCommand(signerAddress, signature);
+          showSendCommand(pending.signatures.map((s) => JSON.parse(s)));
         }
       } else {
-        showSendCommand(signerAddress, signature);
+        showSendCommand(pending.signatures.map((s) => JSON.parse(s)));
       }
     } else {
       console.log(chalk.yellow(`\n  Need ${requiredSignatures - currentSignatures} more signature(s).`));
       console.log(chalk.gray('\n  Run "bako-vault sign" again with another signer.\n'));
-
-      // Save this signature to pending
-      const sigEntry = JSON.stringify({ signer: signerAddress, signature });
-      if (!pending.signatures.includes(sigEntry)) {
-        pending.signatures.push(sigEntry);
-        savePendingTransaction(pending);
-      }
     }
   } catch (error) {
     console.error(chalk.red(`\nError: ${(error as Error).message}\n`));
@@ -168,8 +173,8 @@ export async function sign(options: SignOptions): Promise<void> {
  * @param {string} signature - Signature
  * @private
  */
-function showSendCommand(signer: string, signature: string): void {
+function showSendCommand(allSignatures: {signer: string, signature: string}[]): void {
   console.log(chalk.gray('\n' + '─'.repeat(70)));
   console.log(chalk.white('\n  Manual send command:'));
-  console.log(chalk.gray(`    npm run dev -- send-tx -s ${signer} -S ${signature}\n`));
+  console.log(chalk.gray(`    npm run dev -- send-tx\n`));
 }

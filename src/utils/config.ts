@@ -5,7 +5,7 @@
 
 import { readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
-import type { WalletConfig, NetworkConfig, PendingTransaction } from '../types.js';
+import type { WalletConfig, NetworkConfig, PendingTransaction, Signature } from '../types.js';
 
 /** Directory containing wallet configuration files */
 const WALLETS_DIR = join(process.cwd(), 'wallets');

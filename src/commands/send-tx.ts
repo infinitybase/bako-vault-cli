@@ -14,7 +14,6 @@ import {
 } from '../utils/config.js';
 import { sendTransaction } from '../services/transaction.js';
 import type { VaultConfig } from '../types.js';
-import {type} from "node:os";
 
 /**
  * Options for the send-tx command
@@ -56,11 +55,14 @@ export async function sendTx(options: SendTxOptions): Promise<void> {
   console.log(chalk.white('\n  Hash:'));
   console.log(chalk.cyan(`    ${pending.hashTxId}`));
 
-  let signatures = pending.signatures.map((s: string) => JSON.parse(s));
+  const signatures = pending.signatures;
 
-  if (signatures.length < pending.requiredSignatures) {
+  const uniqueSigners = new Set(signatures.map((s) => s.signer));
+  const uniqueCount = uniqueSigners.size;
+
+  if (uniqueCount < pending.requiredSignatures) {
     console.log(
-      chalk.red(`\nError: Need ${pending.requiredSignatures} signatures, got ${signatures.length}\n`)
+        chalk.red(`\nError: Need ${pending.requiredSignatures} unique signatures, got ${uniqueCount}\n`)
     );
     return;
   }

@@ -81,6 +81,15 @@ export interface TransactionInput {
 }
 
 /**
+ * Signature object (signer + signature)
+ * @typedef Signature
+ */
+export type Signature = {
+  signer: string;
+  signature: string;
+};
+
+/**
  * Pending transaction stored while waiting for signatures
  * @interface PendingTransaction
  */
@@ -99,8 +108,8 @@ export interface PendingTransaction {
   transaction: TransactionInput;
   /** ISO timestamp of creation */
   createdAt: string;
-  /** Array of collected signatures (JSON strings) */
-  signatures: string[];
+  /** Array of collected signatures (objects) */
+  signatures: Signature[];
   /** Number of signatures required */
   requiredSignatures: number;
 }

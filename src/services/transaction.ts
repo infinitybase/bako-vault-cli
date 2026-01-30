@@ -3,6 +3,7 @@
  * @module services/transaction
  */
 
+import { ScriptTransactionRequest } from 'fuels';
 import type { VaultConfig, TransactionInput, PendingTransaction } from '../types.js';
 import { createVaultInstance } from './vault.js';
 import {
@@ -101,18 +102,9 @@ export async function sendTransaction(
   // Load the pending transaction
   const pending = loadPendingTransaction();
 
-  // Recreate the transaction (same parameters)
-  const assetId = pending.transaction.assetId || config.network.assets.ETH;
-
-  const { tx } = await vault.transaction({
-    assets: [
-      {
-        assetId,
-        amount: pending.transaction.amount, // Decimal string
-        to: pending.transaction.to,
-      },
-    ],
-  });
+  // Restore the original transaction from saved txRequest
+  // This ensures we use the exact same inputs/UTXOs that were signed
+  const tx = new ScriptTransactionRequest(pending.txRequest as object);
 
   // Build witnesses array with encoded signatures (same as SDK tests)
   const witnesses: string[] = [];

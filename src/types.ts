@@ -2,6 +2,7 @@
  * @fileoverview Type definitions for the Bako Vault CLI
  * @module types
  */
+import type { ScriptTransactionRequestLike } from 'fuels';
 
 /**
  * Configuration for the predicate's configurable parameters
@@ -81,6 +82,15 @@ export interface TransactionInput {
 }
 
 /**
+ * Signature object (signer + signature)
+ * @typedef Signature
+ */
+export type Signature = {
+  signer: string;
+  signature: string;
+};
+
+/**
  * Pending transaction stored while waiting for signatures
  * @interface PendingTransaction
  */
@@ -94,13 +104,13 @@ export interface PendingTransaction {
   /** Encoded transaction ID */
   encodedTxId: string;
   /** Serialized transaction request (JSON) */
-  txRequest: unknown;
+  txRequest: ScriptTransactionRequestLike;
   /** Original transaction input */
   transaction: TransactionInput;
   /** ISO timestamp of creation */
   createdAt: string;
-  /** Array of collected signatures (JSON strings) */
-  signatures: string[];
+  /** Array of collected signatures (objects) */
+  signatures: Signature[];
   /** Number of signatures required */
   requiredSignatures: number;
 }

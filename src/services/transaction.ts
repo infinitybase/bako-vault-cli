@@ -2,7 +2,6 @@
  * @fileoverview Transaction service for creating and sending vault transactions
  * @module services/transaction
  */
-
 import { ScriptTransactionRequest } from 'fuels';
 import type { VaultConfig, TransactionInput, PendingTransaction } from '../types.js';
 import { createVaultInstance } from './vault.js';
@@ -102,9 +101,7 @@ export async function sendTransaction(
   // Load the pending transaction
   const pending = loadPendingTransaction();
 
-  // Restore the original transaction from saved txRequest
-  // This ensures we use the exact same inputs/UTXOs that were signed
-  const tx = new ScriptTransactionRequest(pending.txRequest as object);
+  const tx = ScriptTransactionRequest.from(pending.txRequest)
 
   // Build witnesses array with encoded signatures (same as SDK tests)
   const witnesses: string[] = [];

@@ -93,14 +93,23 @@ export async function sign(options: SignOptions): Promise<void> {
     console.log(chalk.green(`    ${signature}`));
 
     // Save this signature to pending
-    const sigEntry = JSON.stringify({ signer: signerAddress, signature });
-    if (!pending.signatures.includes(sigEntry)) {
-      pending.signatures.push(sigEntry);
+    const existing = pending.signatures.some(
+        (s) => s.signer === signerAddress
+    );
+
+    if (existing) {
+      console.log(chalk.yellow('\nSignature from this signer already exists.\n'));
+    } else {
+      pending.signatures.push({ signer: signerAddress, signature });
       savePendingTransaction(pending);
     }
 
     // Check threshold
-    const currentSignatures = pending.signatures.length;
+    const uniqueSigners = new Set(
+        pending.signatures.map((s) => s.signer)
+    );
+
+    const currentSignatures = uniqueSigners.size;
     const requiredSignatures = pending.requiredSignatures;
 
     console.log(chalk.white('\n  Signatures:'));
@@ -130,10 +139,10 @@ export async function sign(options: SignOptions): Promise<void> {
           };
 
           // Use only pending signatures (already unique)
-          const allSignatures = pending.signatures.map((s) => JSON.parse(s));
+          const allSignatures = pending.signatures;
 
           // Pass raw signature - sendTransaction will encode it
-          const result = await sendTransaction(config, allSignatures );
+          const result = await sendTransaction(config, allSignatures);
 
           spinner.succeed('Transaction sent!');
 
